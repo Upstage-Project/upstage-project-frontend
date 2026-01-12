@@ -1,0 +1,134 @@
+/* ... container, header, logo, closeBtn 등은 기존 유지 ... */
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+  }
+  .header {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 40px; /* 로고 위치 맞춤 */
+    background-color: #ffffff;
+  }
+  .logo { font-size: 1.5rem; font-weight: 800; color: #1a73e8; cursor: pointer; }
+  .closeBtn { background: none; border: none; font-size: 1rem; color: #5f6368; cursor: pointer; }
+  
+  /* --- 본문 영역 수정 --- */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 전체적으로는 중앙 정렬하되 */
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+  
+  /* ★ 타이틀 왼쪽 정렬을 위한 래퍼 */
+  .titleWrapper {
+    width: 100%;
+    max-width: 600px; 
+    margin-bottom: 20px;
+    /* text-align: left; 기본값이지만 명시적으로 둠 */
+  }
+  
+  .pageTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #202124;
+    text-align: left; /* 타이틀은 확실하게 왼쪽! */
+    margin: 0;
+  }
+  
+  .emailText {
+    color: #1a73e8; /* 이메일만 파란색 포인트 */
+  }
+  
+  .suffixText {
+    color: #202124;
+  }
+  
+  /* --- 주식 관리 섹션 --- */
+  /* --- ★ 여기가 수정 포인트입니다 ★ --- */
+  .stockSection {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    
+    /* 핵심: 내부 아이템(검색창, 카드)을 가로축 중앙으로 정렬 */
+    align-items: center; 
+    
+    gap: 20px;
+  }
+  
+  /* 임시 영역 스타일 (나중에 컴포넌트로 대체되면 삭제) */
+  .placeholderArea {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    border: 1px dashed #e0e0e0;
+    border-radius: 12px;
+  }
+  
+  .userStockArea {
+    margin-top: 20px;
+  }
+  
+  .listTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #5f6368;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  
+  .stockListPlaceholder {
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    text-align: center;
+    color: #9aa0a6;
+  }
+  
+  /* 로그아웃 버튼 위치 조정 */
+  .logoutBtn {
+    margin-top: 40px;
+    padding: 12px 24px;
+    background-color: transparent;
+    border: 1px solid #dadce0;
+    color: #5f6368;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .logoutBtn:hover {
+    background-color: #f1f3f4;
+    color: #d93025;
+    border-color: #d93025;
+  }
+
+  .userStockArea {
+    width: 100%; /* 부모(stockSection) 너비인 600px을 꽉 채움 */
+    margin-top: 30px;
+  }
+  
+  .stockList {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /* 플레이스홀더 텍스트 디자인 */
+  .stockListPlaceholder {
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    text-align: center;
+    color: #9aa0a6;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }

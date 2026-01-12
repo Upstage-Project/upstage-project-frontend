@@ -1,0 +1,43 @@
+.searchContainer {
+    display: flex;
+    width: 100%;
+    position: relative; /* 아이콘 배치를 위해 */
+    align-items: center;
+  }
+  
+  .searchInput {
+    width: 100%;
+    padding: 14px 50px 14px 20px; /* 오른쪽 패딩을 늘려서 버튼 공간 확보 */
+    font-size: 1rem;
+    border: 1px solid #dfe1e5;
+    border-radius: 24px; /* 둥근 검색창 스타일 */
+    outline: none;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .searchInput:focus {
+    background-color: #ffffff;
+    border-color: #1a73e8; /* FinMate 블루 */
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+  }
+  
+  .searchBtn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .searchBtn:hover {
+    background-color: #f1f3f4;
+  }
