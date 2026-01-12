@@ -118,3 +118,10 @@
   .newChatBtn:hover {
     background-color: #1557b0;
   }
+
+  .loadingItem, .emptyItem {
+    padding: 20px;
+    text-align: center;
+    color: #9aa0a6;
+    font-size: 0.9rem;
+  }
