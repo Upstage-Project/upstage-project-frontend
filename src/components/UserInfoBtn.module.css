@@ -1,28 +1,41 @@
 /* src/components/UserInfoBtn.module.css */
 .btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background-color: transparent; /* 배경 투명하게 */
-    border: 1px solid #e0e0e0;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #5f6368;
-  }
-  
-  .btn:hover {
-    background-color: #f5f5f5;
-    border-color: #d0d0d0;
-    color: #202124;
-  }
-  
-  .icon {
-    font-size: 1.1rem;
-  }
-  
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px; /* 패딩 살짝 조정 */
+  background-color: transparent;
+  border: 1px solid transparent; /* 평소엔 투명 테두리 */
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #5f6368;
+}
+
+.btn:hover {
+  background-color: #f1f3f4;
+  color: #202124;
+}
+
+.icon {
+  font-size: 1.2rem;
+  display: flex; /* 아이콘 수직 정렬 보정 */
+  align-items: center;
+}
+
+.text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap; /* 글씨 줄바꿈 방지 */
+}
+
+/* ★ 반응형: 화면 너비가 600px 이하일 때 글씨(.text) 숨기기 */
+@media (max-width: 600px) {
   .text {
-    font-size: 0.95rem;
-    font-weight: 600;
+    display: none;
   }
+  .btn {
+    padding: 8px; /* 글씨가 없어지면 패딩 줄여서 동그랗게 보이게 */
+    border-radius: 50%;
+  }
+}

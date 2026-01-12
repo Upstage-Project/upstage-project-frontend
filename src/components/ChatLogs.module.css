@@ -1,0 +1,120 @@
+/* src/components/ChatLogs.module.css */
+
+/* 오버레이 (그대로 유지) */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .showOverlay {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* ★ 사이드바 본체 (위치 변경) */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    
+    /* 기존 left: -300px 삭제하고 right로 변경 */
+    right: -300px; 
+    left: auto; /* 왼쪽 기준 무시 */
+    
+    width: 280px;
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 100;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1); /* 그림자 방향도 반대로 */
+    transition: right 0.3s ease; /* transition 속성 변경 */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ★ 열렸을 때 (오른쪽 0에 딱 붙음) */
+  .open {
+    right: 0;
+  }
+  
+  /* 사이드바 내부 스타일 */
+  .header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #202124;
+    margin: 0;
+  }
+  
+  .closeBtn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #5f6368;
+  }
+  
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1; /* 남는 공간 차지 */
+    overflow-y: auto;
+  }
+  
+  .item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .item:hover {
+    background-color: #f1f3f4;
+  }
+  
+  .logTitle {
+    display: block;
+    font-size: 0.95rem;
+    color: #202124;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  
+  .logDate {
+    display: block;
+    font-size: 0.8rem;
+    color: #9aa0a6;
+  }
+  
+  .footer {
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+  }
+  
+  .newChatBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .newChatBtn:hover {
+    background-color: #1557b0;
+  }

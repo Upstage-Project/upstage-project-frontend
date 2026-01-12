@@ -7,44 +7,98 @@
     background-color: #ffffff;
   }
   
-  /* --- 새로 추가된 헤더 스타일 --- */
+  /* --- 헤더 --- */
   .header {
     flex-shrink: 0;
     width: 100%;
     background-color: #ffffff;
     z-index: 10;
     box-sizing: border-box;
-    
-    /* 패딩은 LoginHome과 맞춤 (15px 40px) */
     padding: 15px 40px; 
-  
-    /* ★ 핵심 추가: Flexbox로 양쪽 끝 배치 */
+    
+    /* 양쪽 끝 배치: [로고] <---------> [오른쪽 버튼 그룹] */
     display: flex;
-    justify-content: space-between; /* 로고는 왼쪽, 버튼은 오른쪽으로 찢음 */
-    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: space-between;
+    align-items: center; 
   }
   
+  /* 로고 스타일 */
   .logo {
     font-size: 1.5rem;
     font-weight: 800;
     color: #1a73e8;
     letter-spacing: -0.5px;
-    text-align: left;
     margin: 0;
-    /* 로고는 가만히 있고 버튼만 추가되는 구조 */
+    user-select: none;
   }
   
-  /* --- 기존 채팅 영역 (살짝 수정) --- */
+  /* ★ 오른쪽 그룹: 가로(Row) 배치 */
+  .rightHeader {
+    display: flex;
+    flex-direction: row; /* 가로 배치 */
+    align-items: center; 
+    gap: 12px; /* 버튼 사이 간격 */
+  }
+  
+  /* ★ 채팅 기록 버튼 스타일 (UserInfoBtn과 스타일 통일) */
+  .historyBtn {
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #5f6368;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+  
+  .historyBtn:hover {
+    background-color: #f1f3f4;
+    color: #202124;
+  }
+  
+  /* 채팅 영역 */
   .chatSection {
     flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 0 20px 20px 20px; /* 상단 padding을 빼서 헤더와 자연스럽게 연결 */
+    align-items: center; 
+    padding: 0 20px 20px 20px;
   }
-  
-  /* ... chatContent, inputSection 등 나머지는 기존 유지 ... */
   .chatContent { width: 100%; max-width: 800px; }
-  .inputSection { flex-shrink: 0; width: 100%; display: flex; justify-content: center; padding: 20px; border-top: 1px solid #e0e0e0; }
+  
+  /* 입력창 영역 */
+  .inputSection {
+    flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    padding: 20px;
+    z-index: 10;
+  }
   .inputWrapper { width: 100%; max-width: 800px; }
+  
+  /* ★ 반응형 (모바일) 설정 */
+  @media (max-width: 600px) {
+    .header {
+      padding: 16px 20px;
+    }
+  
+    /* 모바일에서 채팅 기록 버튼의 글씨(.btnText) 숨기기 */
+    .btnText {
+      display: none;
+    }
+    
+    /* 글씨 사라지면 아이콘만 남으므로 동그랗게 변경 */
+    .historyBtn {
+      padding: 8px;
+      border-radius: 50%;
+    }
+  }
