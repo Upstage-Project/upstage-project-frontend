@@ -1,0 +1,28 @@
+/* src/components/UserInfoBtn.module.css */
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: transparent; /* 배경 투명하게 */
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #5f6368;
+  }
+  
+  .btn:hover {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+    color: #202124;
+  }
+  
+  .icon {
+    font-size: 1.1rem;
+  }
+  
+  .text {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }

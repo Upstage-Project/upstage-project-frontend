@@ -1,0 +1,45 @@
+/* src/components/QuestionInput.module.css */
+.inputContainer {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    background-color: #f9f9f9;
+    transition: all 0.2s ease;
+  }
+  
+  .input:focus {
+    border-color: #1a73e8;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+  }
+  
+  .sendBtn {
+    padding: 0 24px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .sendBtn:disabled {
+    background-color: #e8eaed;
+    color: #9aa0a6;
+    cursor: not-allowed;
+  }
+  
+  .sendBtn:not(:disabled):hover {
+    background-color: #1557b0;
+  }
