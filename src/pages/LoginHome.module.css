@@ -1,0 +1,77 @@
+/* src/pages/LoginHome.module.css */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: #ffffff;
+  
+  /* ★ 수정된 부분: 하단 여백을 대폭 늘려서 버튼을 위로 올림 */
+  /* padding: 0;  <-- 기존 코드 제거 */
+  padding: 0 0 10vh 0; /* 위 0, 좌우 0, 아래 10vh(화면 높이의 10%) */
+}
+
+/* --- 상단 로고 (그대로 유지) --- */
+.header {
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 40px; 
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a73e8;
+  letter-spacing: -0.5px;
+  text-align: left;
+  margin: 0;
+}
+
+/* --- 중앙 설명 영역 --- */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 40px;
+  
+  /* ★ 추가된 부분: 내용을 시각적으로 조금 더 위로 당기기 위해 하단에 가상의 공간 추가 */
+  padding-bottom: 40px; 
+}
+
+/* ... 타이틀, 서브타이틀 스타일은 그대로 ... */
+.title { font-size: 2.5rem; font-weight: 700; margin-bottom: 20px; line-height: 1.2; word-break: keep-all; }
+.title span { color: #1a73e8; display: block; }
+.subtitle { font-size: 1.2rem; color: #5f6368; line-height: 1.6; word-break: keep-all; }
+
+/* --- 하단 버튼 영역 --- */
+.footer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 40px; /* 위아래 패딩을 wrapper에게 넘겼으므로 여기는 좌우만 */
+}
+
+/* ... 버튼 스타일은 그대로 ... */
+.loginBtn { width: 100%; max-width: 360px; padding: 16px; background-color: #1a73e8; color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+.notice { font-size: 0.8rem; color: #9aa0a6; margin-top: 12px; }
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+  .wrapper {
+    /* 모바일에서는 버튼을 더 위로 올림 (브라우저 주소창 고려) */
+    padding-bottom: 120px; 
+  }
+  .header { padding: 15px 20px; }
+  .main { padding: 0 20px; padding-bottom: 20px; }
+  .footer { padding: 0 20px; }
+  .title { font-size: 1.8rem; }
+}
