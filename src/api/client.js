@@ -3,11 +3,12 @@ import axios from 'axios';
 
 // 1. axios 인스턴스 생성 (기본 설정)
 const client = axios.create({
-  baseURL: 'http://localhost:8000', // FastAPI 백엔드 주소 (보통 8000번)
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+    // .env 파일에 적은 주소를 가져옴, 없으면 기본값으로 localhost 사용
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
 // 2. 요청 가로채기 (Interceptors)
 // 요청을 보내기 직전에 토큰을 자동으로 헤더에 넣어줍니다.

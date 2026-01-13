@@ -1,40 +1,53 @@
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase'; 
-// ★ getAdditionalUserInfo 추가 임포트 필수!
 import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth'; 
+import { socialLogin } from '../api/authApi'; // ★ [1] API 함수 추가
 import styles from './LoginHome.module.css';
 
 export default function LoginHome() {
-  const navigate = useNavigate();
+  const useNavigateHook = useNavigate(); // 변수명 충돌 방지 (선택사항)
 
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
 
-      // 1. 팝업 로그인 실행
+      // 1. 파이어베이스 팝업 로그인 (프론트 인증)
       const result = await signInWithPopup(auth, provider);
+      const user = result.user;
       
-      // 2. ★ 신규 유저 여부 확인 (핵심 코드)
-      const details = getAdditionalUserInfo(result);
-      const isNewUser = details?.isNewUser; // true면 첫 가입, false면 기존 유저
+      // 2. ★ 백엔드에 보낼 '주민등록증(ID Token)' 꺼내기
+      const idToken = await user.getIdToken(); 
+      console.log("백엔드로 보낼 토큰 준비 완료!");
 
-      localStorage.setItem('accessToken', 'dev-test-token');
+      // 3. ★ 백엔드 API 호출 (로그인 검증 요청)
+      // "백엔드야, 이 토큰 확인하고 내 정보(DB)랑 진짜 토큰(JWT) 줘!"
+      const backendResponse = await socialLogin('google', idToken);
 
-      // 3. 분기 처리
-      if (isNewUser) {
-        // [첫 방문] 환영 메시지 띄우고 -> 내 정보 페이지로 납치
-        alert("환영합니다! 서비스 이용을 위해 관심 주식을 먼저 등록해주세요.");
-        navigate('/userinfo'); 
-      } else {
-        // [기존 방문] 그냥 홈으로 이동
-        console.log("기존 회원입니다. 홈으로 이동합니다.");
-        navigate('/home');
+      // 4. 백엔드 응답 처리
+      if (backendResponse) { // (성공 여부는 백엔드 응답 구조에 따라 .success 체크 등을 추가)
+        
+        // ★ [중요] 백엔드가 준 진짜 토큰을 저장해야 합니다.
+        // (만약 백엔드가 accessToken이라는 이름으로 준다면 아래처럼 저장)
+        const tokenToSave = backendResponse.accessToken || idToken; 
+        localStorage.setItem('accessToken', tokenToSave);
+
+        // 5. 신규 유저 확인 및 페이지 이동
+        const details = getAdditionalUserInfo(result);
+        const isNewUser = details?.isNewUser; 
+
+        if (isNewUser) {
+          alert("환영합니다! 서비스 이용을 위해 관심 주식을 먼저 등록해주세요.");
+          useNavigateHook('/userinfo'); 
+        } else {
+          console.log("기존 회원입니다. 홈으로 이동합니다.");
+          useNavigateHook('/home');
+        }
       }
 
     } catch (error) {
-      console.error("로그인 에러:", error);
-      alert("로그인 중 문제가 발생했습니다.");
+      console.error("로그인 프로세스 에러:", error);
+      alert("서버와 통신 중 문제가 발생했습니다.");
     }
   };
 
