@@ -3,10 +3,11 @@ import ChatWindow from '../components/ChatWindow';
 import QuestionInput from '../components/QuestionInput';
 import UserInfoBtn from '../components/UserInfoBtn';
 import ChatLogs from '../components/ChatLogs';
+// ★ API 함수 임포트 (경로 확인해주세요)
+import { sendChatMessage } from '../api/chatApi'; 
 import styles from './LoggedInHome.module.css';
 
 export default function LoggedInHome() {
-  // 초기 메시지 상수
   const INITIAL_MESSAGE = { 
     id: 1, 
     sender: 'ai', 
@@ -15,52 +16,68 @@ export default function LoggedInHome() {
 
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // ★ 읽기 전용 모드 상태 (true면 입력창 대신 안내 문구 표시)
   const [isReadOnly, setIsReadOnly] = useState(false);
+  
+  // ★ 로딩 상태 추가 (AI가 생각 중인지)
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 메시지 전송 핸들러
-  const handleSendMessage = (text) => {
+  // ★ API 연동된 메시지 전송 핸들러
+  const handleSendMessage = async (text) => {
+    // 1. 내 메시지 즉시 화면에 추가 (낙관적 업데이트)
     const userMessage = { id: Date.now(), sender: 'user', text: text };
     setMessages((prev) => [...prev, userMessage]);
+    
+    // 2. 로딩 시작
+    setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      // 3. API 호출 (여기서 1.5초 딜레이가 걸림)
+      const response = await sendChatMessage(text);
+
+      // 4. API 응답을 UI 형식으로 변환하여 추가
+      // (API는 role/content를 주고, UI는 sender/text를 씀)
       const aiMessage = { 
-        id: Date.now() + 1, 
-        sender: 'ai', 
-        text: `"${text}"에 대한 분석을 시작합니다...` 
+        id: response.id, 
+        sender: 'ai', // 무조건 AI 응답이므로 'ai' 고정
+        text: response.content 
       };
+      
       setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
+
+    } catch (error) {
+      console.error("메시지 전송 에러:", error);
+      // 에러 메시지 표시
+      const errorMsg = { 
+        id: Date.now(), 
+        sender: 'ai', 
+        text: "죄송합니다. 오류가 발생하여 답변을 가져오지 못했습니다." 
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      // 5. 로딩 끝
+      setIsLoading(false);
+    }
   };
 
-  // 새 채팅 시작 핸들러
   const handleNewChat = () => {
     setMessages([INITIAL_MESSAGE]);
     setIsSidebarOpen(false);
-    
-    // ★ 새 채팅이므로 입력 가능하도록 변경
     setIsReadOnly(false); 
   };
 
-  // 과거 기록 클릭 핸들러
   const handleSelectLog = (log) => {
-    // 실제로는 API로 log.id에 해당하는 대화 내용을 받아와야 합니다.
-    // 여기서는 테스트용 가짜 데이터를 넣습니다.
+    // (이 부분은 나중에 API가 나오면 수정)
     const oldMessages = [
       { id: 10, sender: 'user', text: log.title }, 
       { id: 11, sender: 'ai', text: `"${log.title}"에 대한 과거 상담 내역입니다.\n(이 내용은 읽기 전용입니다)` }
     ];
     setMessages(oldMessages);
     setIsSidebarOpen(false);
-    
-    // ★ 과거 기록이므로 읽기 전용으로 변경 (입력 불가)
     setIsReadOnly(true); 
   };
 
   return (
     <div className={styles.layout}>
-      {/* 사이드바 */}
       <ChatLogs 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
@@ -68,12 +85,9 @@ export default function LoggedInHome() {
         onNewChat={handleNewChat}
       />
 
-      {/* 헤더 */}
       <header className={styles.header}>
         <div className={styles.logo}>FinMate</div>
-
         <div className={styles.rightHeader}>
-          {/* 채팅 기록 버튼 */}
           <button 
             className={styles.historyBtn} 
             onClick={() => setIsSidebarOpen(true)}
@@ -85,28 +99,29 @@ export default function LoggedInHome() {
             </svg>
             <span className={styles.btnText}>채팅 기록</span>
           </button>
-
-          {/* 내 정보 버튼 */}
           <UserInfoBtn />
         </div>
       </header>
 
-      {/* 메인 채팅 영역 */}
       <main className={styles.chatSection}>
         <div className={styles.chatContent}>
            <ChatWindow messages={messages} />
+           
+           {/* ★ 로딩 인디케이터 추가 */}
+           {isLoading && (
+             <div className={styles.typingIndicator}>
+               <span>AI가 답변을 생성하고 있습니다... 💬</span>
+             </div>
+           )}
         </div>
       </main>
 
-      {/* 하단 영역 (입력창 or 읽기전용 안내) */}
       <footer className={styles.inputSection}>
         <div className={styles.inputWrapper}>
-          
-          {/* 읽기 전용이 아닐 때만 입력창 렌더링 */}
           {!isReadOnly ? (
-            <QuestionInput onSendMessage={handleSendMessage} />
+            // 로딩 중일 때는 전송 버튼 막으려면 disabled={isLoading} 전달 가능
+            <QuestionInput onSendMessage={handleSendMessage} disabled={isLoading} />
           ) : (
-            /* 읽기 전용일 때 보여줄 UI */
             <div className={styles.readOnlyMessage}>
               <p>지난 대화 기록을 보고 계십니다.</p>
               <button className={styles.restartBtn} onClick={handleNewChat}>
@@ -114,7 +129,6 @@ export default function LoggedInHome() {
               </button>
             </div>
           )}
-
         </div>
       </footer>
     </div>

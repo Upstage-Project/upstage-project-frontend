@@ -145,3 +145,22 @@
       border-radius: 50%;
     }
   }
+  /* ... 기존 스타일들 ... */
+
+/* ★ 추가: AI 생각 중 표시 */
+.typingIndicator {
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #888;
+    text-align: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 10px 20px; /* 채팅창 안쪽 여백 */
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
