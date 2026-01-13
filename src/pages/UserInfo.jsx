@@ -1,99 +1,154 @@
 // src/pages/UserInfo.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // useEffect 추가
 import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
+
+// ★ 우리가 만든 API 함수들 임포트
+import { searchStock, getMyStocks, addMyStock, deleteMyStock } from '../api/stockApi';
+
 import StockRetrieve from '../components/StockRetrieve';
 import RetrievedStock from '../components/RetrievedStock';
-import UserStock from '../components/UserStock'; // ★ 추가
+import UserStock from '../components/UserStock';
 import styles from './UserInfo.module.css';
 
 export default function UserInfo() {
-  const navigate = useNavigate();
-  const userEmail = "test@finmate.com"; 
+    const navigate = useNavigate();
+    const user = auth?.currentUser;
+    const userEmail = user ? user.email : "test@finmate.com (게스트)";
 
-  // 검색 결과 상태
-  const [searchResult, setSearchResult] = useState(null);
-  
-  // ★ 내 주식 목록 상태 (초기엔 빈 배열 [])
-  const [myStocks, setMyStocks] = useState([]);
+    const [searchResult, setSearchResult] = useState(null);
+    const [myStocks, setMyStocks] = useState([]);
+    const [loading, setLoading] = useState(false); // ★ 로딩 상태 추가
 
-  // 가짜 API 검색 함수
-  const fetchStockInfo = (keyword) => {
-    // 이미 내 목록에 있는 종목인지 확인하는 로직을 추가하면 더 좋습니다.
-    const mockData = {
-      name: keyword,
-      code: '005930', // 테스트용 고정 코드 (실제론 API가 줌)
-      id: Date.now() // 고유 ID용 (테스트용)
+    // 1. 화면이 켜지면 내 주식 리스트를 불러옴 (API 호출)
+    useEffect(() => {
+        loadMyStocks();
+    }, []);
+
+    // 목록 불러오기 함수
+    const loadMyStocks = async () => {
+        try {
+            setLoading(true); // 로딩 시작
+            const data = await getMyStocks(); // API 심부름 시키기
+            setMyStocks(data);
+        } catch (error) {
+            console.error("데이터 로드 실패:", error);
+        } finally {
+            setLoading(false); // 로딩 끝
+        }
     };
-    setSearchResult(mockData);
-  };
 
-  // ★ 주식 등록 함수
-  const handleAddStock = (stock) => {
-    // 중복 체크 (선택사항): 이미 있는 종목이면 등록 안 함
-    if (myStocks.some(item => item.name === stock.name)) {
-      alert("이미 등록된 종목입니다.");
-      return;
-    }
+    const handleLogout = async () => {
+        try {
+            if (confirm("정말 로그아웃 하시겠습니까?")) {
+                if (auth) await signOut(auth);
+                localStorage.removeItem('accessToken');
+                navigate('/');
+            }
+        } catch (error) {
+            console.error("로그아웃 실패:", error);
+        }
+    };
 
-    setMyStocks([...myStocks, stock]); // 목록에 추가
-    setSearchResult(null); // 등록했으니 검색 결과창은 닫기
-  };
+    // 검색 함수 (API 연동)
+    const handleSearch = async (keyword) => {
+        try {
+            setSearchResult(null); // 이전 결과 지우기
+            const result = await searchStock(keyword); // API 호출
+            setSearchResult(result);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
-  // ★ 주식 삭제 함수
-  const handleDeleteStock = (code) => {
-    // 선택한 코드와 다른 것들만 남김 (=선택한 것 삭제)
-    setMyStocks(myStocks.filter(stock => stock.code !== code));
-  };
+    // 추가 함수 (API 연동)
+    const handleAddStock = async (stock) => {
+        if (myStocks.some(item => item.code === stock.code)) {
+            alert("이미 등록된 종목입니다.");
+            return;
+        }
 
-  return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.logo} onClick={() => navigate('/home')}>FinMate</div>
-        <button className={styles.closeBtn} onClick={() => navigate(-1)}>닫기 ✕</button>
-      </header>
+        // 1. API에 저장 요청
+        await addMyStock(stock);
 
-      <main className={styles.content}>
-        <div className={styles.titleWrapper}>
-          <h1 className={styles.pageTitle}>
-            <span className={styles.emailText}>{userEmail}</span> 
-          </h1>
+        // 2. 검색 결과 닫기
+        setSearchResult(null);
+
+        // 3. 목록 다시 불러오기 (최신화)
+        loadMyStocks();
+    };
+
+    // 삭제 함수 (API 연동)
+    const handleDeleteStock = async (code) => {
+        if (confirm("삭제하시겠습니까?")) {
+            await deleteMyStock(code); // API에 삭제 요청
+            loadMyStocks(); // 목록 다시 불러오기 (최신화)
+        }
+    };
+
+    return (
+        <div className={styles.container}>
+            <header className={styles.header}>
+                <div className={styles.logo} onClick={() => navigate('/home')}>FinMate</div>
+                <button className={styles.closeBtn} onClick={() => navigate(-1)}>닫기 ✕</button>
+            </header>
+
+            <main className={styles.content}>
+                <div className={styles.titleWrapper}>
+                    <h1 className={styles.pageTitle}>
+                        <span className={styles.emailText}>{userEmail}</span>
+                    </h1>
+                    <button className={styles.logoutBtn} onClick={handleLogout}>
+                        로그아웃
+                    </button>
+                </div>
+
+                <div className={styles.stockSection}>
+                    {/* props 이름이 handleSearch 로 바뀐 것 주의! */}
+                    <StockRetrieve onSearch={handleSearch} />
+
+                    {searchResult && (
+                        <RetrievedStock
+                            stock={searchResult}
+                            onAdd={handleAddStock}
+                        />
+                    )}
+
+                    <div className={styles.userStockArea}>
+                        <h3 className={styles.listTitle}>내 주식 리스트 ({myStocks.length})</h3>
+
+                        {loading ? (
+                            <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+                                데이터 불러오는 중... ⏳
+                            </div>
+                        ) : myStocks.length === 0 ? (
+
+                            /* ★ 여기가 바로 [주식이 없을 때] 보여주는 부분입니다 ★ */
+                            <div className={styles.stockListPlaceholder}>
+                                <p style={{ fontSize: '3rem', margin: '0 0 10px 0' }}>📂</p>
+                                <strong>아직 관리 중인 주식이 없네요!</strong>
+                                <p style={{ marginTop: '8px', color: '#666' }}>
+                                    위 검색창에서 관심 있는 종목을 찾아<br />
+                                    나만의 포트폴리오를 만들어보세요.
+                                </p>
+                            </div>
+
+                        ) : (
+                            /* 주식이 있을 때는 리스트를 보여줌 */
+                            <div className={styles.stockList}>
+                                {myStocks.map((stock, index) => (
+                                    <UserStock
+                                        key={index}
+                                        stock={stock}
+                                        onDelete={() => handleDeleteStock(stock.code)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
         </div>
-
-        <div className={styles.stockSection}>
-          {/* 1. 검색창 */}
-          <StockRetrieve onSearch={fetchStockInfo} />
-          
-          {/* 2. 검색 결과 (있을 때만 표시) */}
-          {searchResult && (
-            <RetrievedStock 
-              stock={searchResult} 
-              onAdd={handleAddStock} 
-            />
-          )}
-
-          {/* 3. 내 주식 목록 영역 */}
-          <div className={styles.userStockArea}>
-            <h3 className={styles.listTitle}>내 주식 리스트 ({myStocks.length})</h3>
-            
-            {myStocks.length === 0 ? (
-              <div className={styles.stockListPlaceholder}>
-                아직 등록된 주식이 없습니다. <br/>
-                위에서 검색하여 추가해보세요!
-              </div>
-            ) : (
-              <div className={styles.stockList}>
-                {myStocks.map((stock, index) => (
-                  <UserStock 
-                    key={index} // 실제론 unique ID 사용 권장
-                    stock={stock} 
-                    onDelete={() => handleDeleteStock(stock.code)} 
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+    );
 }

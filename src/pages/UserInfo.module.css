@@ -1,4 +1,13 @@
 /* ... container, header, logo, closeBtn 등은 기존 유지 ... */
+.titleWrapper {
+    display: flex;                  /* 가로 배치 시작 */
+    justify-content: space-between; /* 양쪽 끝으로 밀어내기 (좌:이메일, 우:버튼) */
+    align-items: center;            /* 세로 중앙 정렬 */
+    width: 100%;                    /* 전체 너비 사용 */
+    margin-bottom: 20px;            /* 아래 주식 리스트와 간격 유지 */
+    max-width: 600px;  /* 검색창이 보통 이 정도 폭입니다. */
+    margin: 0 auto 20px auto;
+  }
 .container {
     display: flex;
     flex-direction: column;
@@ -44,24 +53,18 @@
     overflow-y: auto;
   }
   
-  /* ★ 타이틀 왼쪽 정렬을 위한 래퍼 */
-  .titleWrapper {
-    width: 100%;
-    max-width: 600px; 
-    margin-bottom: 20px;
-    /* text-align: left; 기본값이지만 명시적으로 둠 */
-  }
+ 
   
   .pageTitle {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #202124;
-    text-align: left; /* 타이틀은 확실하게 왼쪽! */
-    margin: 0;
+    margin: 0;                      /* h1 태그가 가진 기본 여백을 없애야 한 줄이 됨 */
+    font-size: 1.2rem;              /* 기존 폰트 크기 유지 */
+    /* 필요한 경우 여기에 color 등 기존 스타일 유지 */
   }
   
   .emailText {
-    color: #1a73e8; /* 이메일만 파란색 포인트 */
+    font-size: 1.1rem;            /* 이메일 크기를 살짝 조절 */
+    color: #555;                  /* 너무 검은색보다 약간 진회색이 세련됨 */
+    font-weight: 600;
   }
   
   .suffixText {
@@ -113,19 +116,18 @@
   
   /* 로그아웃 버튼 위치 조정 */
   .logoutBtn {
-    margin-top: 40px;
-    padding: 12px 24px;
+    /* 기존 디자인 유지하면서 배치만 잡음 */
+    border: 1px solid #ff6b6b;
     background-color: transparent;
-    border: 1px solid #dadce0;
-    color: #5f6368;
-    border-radius: 20px;
+    color: #ff6b6b;
+    padding: 5px 12px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
+    white-space: nowrap;            /* 글자 줄바꿈 방지 */
   }
   .logoutBtn:hover {
-    background-color: #f1f3f4;
-    color: #d93025;
-    border-color: #d93025;
+    background-color: #ff4d4f;    /* 호버 시 붉은색 채우기 */
+    color: white;
   }
 
   .userStockArea {
@@ -137,6 +139,12 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    gap: 10px;          /* 리스트 사이 간격 (보기 좋게 추가함) */
+  
+    /* ★★★ 여기가 핵심 수정입니다 ★★★ */
+    max-height: 400px;  /* 1. 리스트 영역의 키를 400px로 제한 (이보다 길어지면...) */
+    overflow-y: auto;   /* 2. 자동으로 세로 스크롤바가 생김 */
+    padding-right: 5px; /* 3. 스크롤바가 내용을 가리지 않게 살짝 여백 줌 */
   }
   
   /* 플레이스홀더 텍스트 디자인 */
@@ -167,4 +175,16 @@
   .hamburgerBtn:hover {
     background-color: #f1f3f4;
     color: #202124;
+  }
+
+  /* src/pages/UserInfo.module.css */
+
+  @media (max-width: 480px) {
+    .emailText {
+      font-size: 0.9rem;          /* 모바일에서는 이메일 크기 축소 */
+      max-width: 200px;           /* 너무 길면 말줄임 처리 준비 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }

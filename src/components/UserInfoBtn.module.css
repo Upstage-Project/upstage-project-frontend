@@ -1,41 +1,51 @@
 /* src/components/UserInfoBtn.module.css */
+
 .btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px; /* 패딩 살짝 조정 */
-  background-color: transparent;
-  border: 1px solid transparent; /* 평소엔 투명 테두리 */
-  border-radius: 20px;
+  background: none;        /* 배경 제거 */
+  border: none;            /* ★ 테두리(모서리 선) 제거 */
+  padding: 4px 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: #5f6368;
+  transition: opacity 0.2s ease;
+  outline: none;           /* 클릭 시 생기는 파란 선 제거 */
 }
 
 .btn:hover {
-  background-color: #f1f3f4;
-  color: #202124;
+  opacity: 0.7;            /* 마우스 올리면 살짝 투명하게 효과 */
 }
 
-.icon {
-  font-size: 1.2rem;
-  display: flex; /* 아이콘 수직 정렬 보정 */
-  align-items: center;
+/* 유저 프로필 이미지 */
+.avatar {
+  width: 26px;             /* 크기 적당히 조절 */
+  height: 26px;
+  border-radius: 50%;      /* 사진은 동그랗게 */
+  object-fit: cover;
 }
 
+/* 유저 이름 텍스트 */
 .text {
-  font-size: 0.95rem;
-  font-weight: 600;
-  white-space: nowrap; /* 글씨 줄바꿈 방지 */
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
 }
 
-/* ★ 반응형: 화면 너비가 600px 이하일 때 글씨(.text) 숨기기 */
+/* ★ 반응형 처리: 화면 폭이 600px보다 작아지면 이름 숨기기 */
 @media (max-width: 600px) {
   .text {
-    display: none;
+    display: none;         /* 이름 안 보임 */
   }
+  
   .btn {
-    padding: 8px; /* 글씨가 없어지면 패딩 줄여서 동그랗게 보이게 */
-    border-radius: 50%;
+    padding: 4px;          /* 여백 최소화 */
   }
+}
+
+/* 기본 아이콘(SVG) 크기 조절 */
+.btn svg {
+  width: 22px;
+  height: 22px;
+  color: #444;
 }
