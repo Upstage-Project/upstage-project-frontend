@@ -1,190 +1,218 @@
 /* ... container, header, logo, closeBtn 등은 기존 유지 ... */
 .titleWrapper {
-    display: flex;                  /* 가로 배치 시작 */
-    justify-content: space-between; /* 양쪽 끝으로 밀어내기 (좌:이메일, 우:버튼) */
-    align-items: center;            /* 세로 중앙 정렬 */
-    width: 100%;                    /* 전체 너비 사용 */
-    margin-bottom: 20px;            /* 아래 주식 리스트와 간격 유지 */
-    max-width: 600px;  /* 검색창이 보통 이 정도 폭입니다. */
-    margin: 0 auto 20px auto;
-  }
+  display: flex;                  /* 가로 배치 시작 */
+  justify-content: space-between; /* 양쪽 끝으로 밀어내기 (좌:이메일, 우:버튼) */
+  align-items: center;            /* 세로 중앙 정렬 */
+  width: 100%;                    /* 전체 너비 사용 */
+  margin-bottom: 20px;            /* 아래 주식 리스트와 간격 유지 */
+  max-width: 600px;  /* 검색창이 보통 이 정도 폭입니다. */
+  margin: 0 auto 20px auto;
+}
 .container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100vh;
-    background-color: #ffffff;
-  }
-  .header {
-    flex-shrink: 0;
-    width: 100%;
-    background-color: #ffffff;
-    z-index: 10;
-    box-sizing: border-box;
-    padding: 15px 40px; 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+}
+.header {
+  flex-shrink: 0;
+  width: 100%;
+  background-color: #ffffff;
+  z-index: 10;
+  box-sizing: border-box;
+  padding: 15px 40px; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .leftHeader {
-    display: flex;
-    align-items: center;
-    gap: 16px; /* 햄버거와 로고 사이 간격 */
-  }
+.leftHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* 햄버거와 로고 사이 간격 */
+}
 
-  .logo {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #1a73e8;
-    letter-spacing: -0.5px;
-    text-align: left;
-    margin: 0;
-  }
-  .closeBtn { background: none; border: none; font-size: 1rem; color: #5f6368; cursor: pointer; }
-  
-  /* --- 본문 영역 수정 --- */
-  .content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* 전체적으로는 중앙 정렬하되 */
-    padding: 40px 20px;
-    overflow-y: auto;
-  }
-  
- 
-  
-  .pageTitle {
-    margin: 0;                      /* h1 태그가 가진 기본 여백을 없애야 한 줄이 됨 */
-    font-size: 1.2rem;              /* 기존 폰트 크기 유지 */
-    /* 필요한 경우 여기에 color 등 기존 스타일 유지 */
-  }
-  
-  .emailText {
-    font-size: 1.1rem;            /* 이메일 크기를 살짝 조절 */
-    color: #555;                  /* 너무 검은색보다 약간 진회색이 세련됨 */
-    font-weight: 600;
-  }
-  
-  .suffixText {
-    color: #202124;
-  }
-  
-  /* --- 주식 관리 섹션 --- */
-  /* --- ★ 여기가 수정 포인트입니다 ★ --- */
-  .stockSection {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    
-    /* 핵심: 내부 아이템(검색창, 카드)을 가로축 중앙으로 정렬 */
-    align-items: center; 
-    
-    gap: 20px;
-  }
-  
-  /* 임시 영역 스타일 (나중에 컴포넌트로 대체되면 삭제) */
-  .placeholderArea {
-    padding: 20px;
-    text-align: center;
-    color: #888;
-    border: 1px dashed #e0e0e0;
-    border-radius: 12px;
-  }
-  
-  .userStockArea {
-    margin-top: 20px;
-  }
-  
-  .listTitle {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #5f6368;
-    margin-bottom: 10px;
-    text-align: left;
-  }
-  
-  .stockListPlaceholder {
-    padding: 30px;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    text-align: center;
-    color: #9aa0a6;
-  }
-  
-  /* 로그아웃 버튼 위치 조정 */
-  .logoutBtn {
-    /* 기존 디자인 유지하면서 배치만 잡음 */
-    border: 1px solid #ff6b6b;
-    background-color: transparent;
-    color: #ff6b6b;
-    padding: 5px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap;            /* 글자 줄바꿈 방지 */
-  }
-  .logoutBtn:hover {
-    background-color: #ff4d4f;    /* 호버 시 붉은색 채우기 */
-    color: white;
-  }
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a73e8;
+  cursor: pointer; /* 클릭 가능함을 표시 */
+  letter-spacing: -0.5px;
+  text-align: left;
+  margin: 0;
+}
+.closeBtn { background: none; border: none; font-size: 1rem; color: #5f6368; cursor: pointer; }
 
-  .userStockArea {
-    width: 100%; /* 부모(stockSection) 너비인 600px을 꽉 채움 */
-    margin-top: 30px;
-  }
-  
-  .stockList {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;          /* 리스트 사이 간격 (보기 좋게 추가함) */
-  
-    /* ★★★ 여기가 핵심 수정입니다 ★★★ */
-    max-height: 400px;  /* 1. 리스트 영역의 키를 400px로 제한 (이보다 길어지면...) */
-    overflow-y: auto;   /* 2. 자동으로 세로 스크롤바가 생김 */
-    padding-right: 5px; /* 3. 스크롤바가 내용을 가리지 않게 살짝 여백 줌 */
-  }
-  
-  /* 플레이스홀더 텍스트 디자인 */
-  .stockListPlaceholder {
-    padding: 40px;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    text-align: center;
-    color: #9aa0a6;
-    font-size: 0.95rem;
-    line-height: 1.5;
-  }
+/* --- 본문 영역 수정 --- */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 전체적으로는 중앙 정렬하되 */
+  padding: 40px 20px;
+  overflow-y: auto;
+}
 
-  /* ★ 햄버거 버튼 스타일 */
+
+
+.pageTitle {
+  margin: 0;                      /* h1 태그가 가진 기본 여백을 없애야 한 줄이 됨 */
+  font-size: 1.2rem;              /* 기존 폰트 크기 유지 */
+  /* 필요한 경우 여기에 color 등 기존 스타일 유지 */
+}
+
+.emailText {
+  font-size: 1.1rem;            /* 이메일 크기를 살짝 조절 */
+  color: #555;                  /* 너무 검은색보다 약간 진회색이 세련됨 */
+  font-weight: 600;
+}
+
+.suffixText {
+  color: #202124;
+}
+
+/* --- 주식 관리 섹션 --- */
+.stockSection {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  
+  /* 핵심: 내부 아이템(검색창, 카드)을 가로축 중앙으로 정렬 */
+  align-items: center; 
+  
+  gap: 20px;
+}
+
+/* 임시 영역 스타일 (나중에 컴포넌트로 대체되면 삭제) */
+.placeholderArea {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  border: 1px dashed #e0e0e0;
+  border-radius: 12px;
+}
+
+.userStockArea {
+  margin-top: 20px;
+}
+
+.listTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5f6368;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+/* 로그아웃 버튼 위치 조정 */
+.logoutBtn {
+  /* 기존 디자인 유지하면서 배치만 잡음 */
+  border: 1px solid #ff6b6b;
+  background-color: transparent;
+  color: #ff6b6b;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;            /* 글자 줄바꿈 방지 */
+}
+.logoutBtn:hover {
+  background-color: #ff4d4f;    /* 호버 시 붉은색 채우기 */
+  color: white;
+}
+
+.userStockArea {
+  width: 100%; /* 부모(stockSection) 너비인 600px을 꽉 채움 */
+  margin-top: 30px;
+}
+
+.stockList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;          /* 리스트 사이 간격 (보기 좋게 추가함) */
+
+  /* ★★★ 내 주식 리스트 스크롤 영역 ★★★ */
+  max-height: 400px;  /* 1. 리스트 영역의 키를 400px로 제한 (이보다 길어지면...) */
+  overflow-y: auto;   /* 2. 자동으로 세로 스크롤바가 생김 */
+  padding-right: 5px; /* 3. 스크롤바가 내용을 가리지 않게 살짝 여백 줌 */
+}
+
+/* 플레이스홀더 텍스트 디자인 */
+.stockListPlaceholder {
+  padding: 40px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  text-align: center;
+  color: #9aa0a6;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ★ 햄버거 버튼 스타일 */
 .hamburgerBtn {
-    background: none;
-    border: none;
-    font-size: 1.5rem; /* 아이콘 크기 */
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: #5f6368;
+  background: none;
+  border: none;
+  font-size: 1.5rem; /* 아이콘 크기 */
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburgerBtn:hover {
+  background-color: #f1f3f4;
+  color: #202124;
+}
+
+/* ★★★ [신규 추가] 검색 결과 리스트 스타일 ★★★ */
+.searchResultList {
+    width: 100%; /* 부모 너비 꽉 채움 */
+    box-sizing: border-box; /* 패딩 포함해서 너비 계산 */
+    background-color: #f8f9fa; /* 연한 회색 배경 */
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    
+    /* 핵심: 결과가 많으면 스크롤 생성 */
+    max-height: 300px; 
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    
+    /* 내부 아이템들 간격 */
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+    flex-direction: column;
+    gap: 10px; 
+}
 
-  .hamburgerBtn:hover {
-    background-color: #f1f3f4;
-    color: #202124;
-  }
+/* 스크롤바 예쁘게 꾸미기 (선택사항) */
+.searchResultList::-webkit-scrollbar {
+    width: 8px;
+}
+.searchResultList::-webkit-scrollbar-thumb {
+    background-color: #ced4da;
+    border-radius: 4px;
+}
+.searchResultList::-webkit-scrollbar-track {
+    background-color: #f1f3f5;
+}
 
-  /* src/pages/UserInfo.module.css */
-
-  @media (max-width: 480px) {
-    .emailText {
-      font-size: 0.9rem;          /* 모바일에서는 이메일 크기 축소 */
-      max-width: 200px;           /* 너무 길면 말줄임 처리 준비 */
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+@media (max-width: 480px) {
+  .emailText {
+    font-size: 0.9rem;          /* 모바일에서는 이메일 크기 축소 */
+    max-width: 200px;           /* 너무 길면 말줄임 처리 준비 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+  
+  .header {
+      padding: 15px 20px; /* 모바일에서 헤더 패딩 줄임 */
+  }
+}

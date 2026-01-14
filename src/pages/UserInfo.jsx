@@ -1,11 +1,10 @@
-// src/pages/UserInfo.jsx
-import { useState, useEffect } from 'react'; // useEffect 추가
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 
-// ★ 우리가 만든 API 함수들 임포트
-import { searchStock, getMyStocks, addMyStock, deleteMyStock } from '../api/stockApi';
+// API 파일명 확인! (userStockApi.js 인지 stockApi.js 인지 본인 파일명에 맞추세요)
+import { searchStock, getMyStocks, addMyStock, deleteMyStock } from '../api/userStockApi';
 
 import StockRetrieve from '../components/StockRetrieve';
 import RetrievedStock from '../components/RetrievedStock';
@@ -17,25 +16,24 @@ export default function UserInfo() {
     const user = auth?.currentUser;
     const userEmail = user ? user.email : "test@finmate.com (게스트)";
 
-    const [searchResult, setSearchResult] = useState(null);
+    // ★ [변경 1] 검색 결과를 배열([])로 관리
+    const [searchResults, setSearchResults] = useState([]); 
     const [myStocks, setMyStocks] = useState([]);
-    const [loading, setLoading] = useState(false); // ★ 로딩 상태 추가
+    const [loading, setLoading] = useState(false);
 
-    // 1. 화면이 켜지면 내 주식 리스트를 불러옴 (API 호출)
     useEffect(() => {
         loadMyStocks();
     }, []);
 
-    // 목록 불러오기 함수
     const loadMyStocks = async () => {
         try {
-            setLoading(true); // 로딩 시작
-            const data = await getMyStocks(); // API 심부름 시키기
+            setLoading(true);
+            const data = await getMyStocks();
             setMyStocks(data);
         } catch (error) {
             console.error("데이터 로드 실패:", error);
         } finally {
-            setLoading(false); // 로딩 끝
+            setLoading(false);
         }
     };
 
@@ -51,39 +49,52 @@ export default function UserInfo() {
         }
     };
 
-    // 검색 함수 (API 연동)
+    // ★ [변경 2] 검색 함수: 결과를 통째로 배열에 담음
     const handleSearch = async (keyword) => {
         try {
-            setSearchResult(null); // 이전 결과 지우기
-            const result = await searchStock(keyword); // API 호출
-            setSearchResult(result);
+            setSearchResults([]); // 기존 결과 초기화
+            const resultList = await searchStock(keyword); // API가 배열을 줌
+            
+            // 결과가 배열인지 확인하고 상태 업데이트
+            if (resultList && Array.isArray(resultList)) {
+                setSearchResults(resultList);
+            } else if (resultList) {
+                // 혹시라도 배열이 아니라 객체 하나만 올 경우를 대비
+                setSearchResults([resultList]);
+            } else {
+                alert("검색 결과가 없습니다.");
+            }
         } catch (error) {
             alert(error.message);
         }
     };
 
-    // 추가 함수 (API 연동)
     const handleAddStock = async (stock) => {
-        if (myStocks.some(item => item.code === stock.code)) {
+        // 이미 있는지 중복 체크 (stock_id 또는 code 기준)
+        const codeToCheck = stock.stock_id || stock.code;
+        
+        if (myStocks.some(item => (item.stock_id || item.code) === codeToCheck)) {
             alert("이미 등록된 종목입니다.");
             return;
         }
 
-        // 1. API에 저장 요청
-        await addMyStock(stock);
+        try {
+            await addMyStock(stock);
+            
+            // ★ 선택사항: 추가하고 나서 검색 결과를 닫을지 말지 결정
+            // 여기서는 '하나 추가하면 검색창 닫기'로 구현 (원하면 이 줄 삭제)
+            setSearchResults([]); 
 
-        // 2. 검색 결과 닫기
-        setSearchResult(null);
-
-        // 3. 목록 다시 불러오기 (최신화)
-        loadMyStocks();
+            loadMyStocks(); // 목록 갱신
+        } catch (error) {
+            alert("추가 중 오류가 발생했습니다.");
+        }
     };
 
-    // 삭제 함수 (API 연동)
     const handleDeleteStock = async (code) => {
         if (confirm("삭제하시겠습니까?")) {
-            await deleteMyStock(code); // API에 삭제 요청
-            loadMyStocks(); // 목록 다시 불러오기 (최신화)
+            await deleteMyStock(code);
+            loadMyStocks();
         }
     };
 
@@ -105,14 +116,23 @@ export default function UserInfo() {
                 </div>
 
                 <div className={styles.stockSection}>
-                    {/* props 이름이 handleSearch 로 바뀐 것 주의! */}
                     <StockRetrieve onSearch={handleSearch} />
 
-                    {searchResult && (
-                        <RetrievedStock
-                            stock={searchResult}
-                            onAdd={handleAddStock}
-                        />
+                    {/* ★ [변경 3] 검색 결과가 여러 개일 때 반복문(map)으로 렌더링 */}
+                    {searchResults.length > 0 && (
+                        <div className={styles.searchResultList}>
+                            <h4 style={{ margin: '0 0 10px 0', color: '#555' }}>
+                                🔍 검색 결과 ({searchResults.length}건)
+                            </h4>
+                            {searchResults.map((stock) => (
+                                <RetrievedStock
+                                    // 백엔드 데이터에 따라 고유한 key 값 설정 (중요!)
+                                    key={stock.stock_id || stock.code} 
+                                    stock={stock}
+                                    onAdd={handleAddStock}
+                                />
+                            ))}
+                        </div>
                     )}
 
                     <div className={styles.userStockArea}>
@@ -123,8 +143,6 @@ export default function UserInfo() {
                                 데이터 불러오는 중... ⏳
                             </div>
                         ) : myStocks.length === 0 ? (
-
-                            /* ★ 여기가 바로 [주식이 없을 때] 보여주는 부분입니다 ★ */
                             <div className={styles.stockListPlaceholder}>
                                 <p style={{ fontSize: '3rem', margin: '0 0 10px 0' }}>📂</p>
                                 <strong>아직 관리 중인 주식이 없네요!</strong>
@@ -133,15 +151,13 @@ export default function UserInfo() {
                                     나만의 포트폴리오를 만들어보세요.
                                 </p>
                             </div>
-
                         ) : (
-                            /* 주식이 있을 때는 리스트를 보여줌 */
                             <div className={styles.stockList}>
                                 {myStocks.map((stock, index) => (
                                     <UserStock
-                                        key={index}
+                                        key={stock.stock_id || stock.code || index}
                                         stock={stock}
-                                        onDelete={() => handleDeleteStock(stock.code)}
+                                        onDelete={() => handleDeleteStock(stock.stock_id || stock.code)}
                                     />
                                 ))}
                             </div>
