@@ -1,38 +1,35 @@
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase'; 
-import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth'; 
-import { socialLogin } from '../api/authApi'; // ★ [1] API 함수 추가
+// ★ signOut 추가됨
+import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, signOut } from 'firebase/auth'; 
+import { socialLogin } from '../api/authApi'; 
 import styles from './LoginHome.module.css';
 
 export default function LoginHome() {
-  const useNavigateHook = useNavigate(); // 변수명 충돌 방지 (선택사항)
+  const useNavigateHook = useNavigate(); 
 
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
 
-      // 1. 파이어베이스 팝업 로그인 (프론트 인증)
+      // 1. 파이어베이스 팝업 로그인
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
-      // 2. ★ 백엔드에 보낼 '주민등록증(ID Token)' 꺼내기
+      // 2. 백엔드에 보낼 토큰 준비
       const idToken = await user.getIdToken(); 
       console.log("백엔드로 보낼 토큰 준비 완료!");
 
-      // 3. ★ 백엔드 API 호출 (로그인 검증 요청)
-      // "백엔드야, 이 토큰 확인하고 내 정보(DB)랑 진짜 토큰(JWT) 줘!"
+      // 3. 백엔드 API 호출
       const backendResponse = await socialLogin('google', idToken);
 
-      // 4. 백엔드 응답 처리
-      if (backendResponse) { // (성공 여부는 백엔드 응답 구조에 따라 .success 체크 등을 추가)
-        
-        // ★ [중요] 백엔드가 준 진짜 토큰을 저장해야 합니다.
-        // (만약 백엔드가 accessToken이라는 이름으로 준다면 아래처럼 저장)
+      // 4. 백엔드 응답 처리 (성공 시)
+      if (backendResponse) { 
         const tokenToSave = backendResponse.accessToken || idToken; 
         localStorage.setItem('accessToken', tokenToSave);
 
-        // 5. 신규 유저 확인 및 페이지 이동
+        // 신규 유저 확인 및 이동
         const details = getAdditionalUserInfo(result);
         const isNewUser = details?.isNewUser; 
 
@@ -47,7 +44,13 @@ export default function LoginHome() {
 
     } catch (error) {
       console.error("로그인 프로세스 에러:", error);
-      alert("서버와 통신 중 문제가 발생했습니다.");
+
+      // ★ [핵심 수정] 에러 발생 시 파이어베이스 로그인도 강제 취소
+      // 이걸 해야 새로고침 했을 때 홈으로 안 넘어갑니다.
+      await signOut(auth);
+      localStorage.removeItem('accessToken'); // 혹시 모를 쓰레기 토큰 삭제
+
+      alert("서버 연결 실패! 로그인이 취소되었습니다.\n(백엔드 연결 상태를 확인해주세요)");
     }
   };
 

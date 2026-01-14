@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'; // Navigate 추가
+// src/App.jsx 수정본
+import { useEffect, useState } from 'react'; // useState 추가
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -9,70 +10,46 @@ import UserInfo from './pages/UserInfo';
 
 import './App.css';
 
-// 🔒 로그인한 사람만 들어갈 수 있는 경로 (Home, UserInfo 등)
-function PrivateRoute({ children }) {
-  const token = localStorage.getItem('accessToken');
-  // 토큰이 없으면 로그인 페이지("/")로 보내고, 현재 히스토리를 교체(replace)함
-  return token ? children : <Navigate to="/" replace />;
-}
-
-// 🔓 로그인 안 한 사람만 들어갈 수 있는 경로 (Login 페이지)
-function PublicRoute({ children }) {
-  const token = localStorage.getItem('accessToken');
-  // 이미 토큰이 있으면 홈("/home")으로 보냄
-  return token ? <Navigate to="/home" replace /> : children;
-}
-
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // ★ 인증 확인 중임을 나타내는 상태
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        console.log("✅ 로그인 감지됨:", user.email);
-        const token = await user.getIdToken();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        console.log("✅ 로그인 감지됨:", firebaseUser.email);
+        const token = await firebaseUser.getIdToken();
         localStorage.setItem('accessToken', token);
+        setUser(firebaseUser);
       } else {
-        console.log("👋 로그아웃 상태입니다.");
+        console.log("👋 로그아웃 또는 유저 삭제됨");
         localStorage.removeItem('accessToken');
+        setUser(null);
       }
+      setLoading(false); // ★ 확인이 끝나면 로딩 완료
     });
 
     return () => unsubscribe();
   }, []);
 
+  // ★ 아주 중요: 파이어베이스가 "이 사람 유효한가?" 검사하는 동안은 아무것도 안 보여줌
+  if (loading) return <div className="loading-screen">인증 확인 중...</div>;
+
+  // 🔒 내부 함수로 보호 로직 이동 (App 상태인 user를 직접 사용)
+  const PrivateRoute = ({ children }) => {
+    return user ? children : <Navigate to="/" replace />;
+  };
+
+  const PublicRoute = ({ children }) => {
+    return user ? <Navigate to="/home" replace /> : children;
+  };
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* 1. 로그인 페이지: 로그인 된 사람은 못 들어감 */}
-        <Route 
-          path="/" 
-          element={
-            <PublicRoute>
-              <LoginHome />
-            </PublicRoute>
-          } 
-        />
-        
-        {/* 2. 메인 홈: 로그인 안 된 사람은 못 들어감 */}
-        <Route 
-          path="/home" 
-          element={
-            <PrivateRoute>
-              <LoggedInHome />
-            </PrivateRoute>
-          } 
-        />
-        
-        {/* 3. 내 정보: 로그인 안 된 사람은 못 들어감 */}
-        <Route 
-          path="/userinfo" 
-          element={
-            <PrivateRoute>
-              <UserInfo />
-            </PrivateRoute>
-          } 
-        />
-
-        {/* 잘못된 경로로 접근 시 홈으로 이동 */}
+        <Route path="/" element={<PublicRoute><LoginHome /></PublicRoute>} />
+        <Route path="/home" element={<PrivateRoute><LoggedInHome /></PrivateRoute>} />
+        <Route path="/userinfo" element={<PrivateRoute><UserInfo /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
