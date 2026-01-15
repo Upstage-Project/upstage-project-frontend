@@ -3,22 +3,24 @@ import ChatWindow from '../components/ChatWindow';
 import QuestionInput from '../components/QuestionInput';
 import UserInfoBtn from '../components/UserInfoBtn';
 import ChatLogs from '../components/ChatLogs';
-// ★ API 함수 임포트 (경로 확인해주세요)
-import { sendChatMessage } from '../api/chatApi'; 
+
+// ★ [수정 1] 함수 이름을 agentApi.js 에 정의된 것과 똑같이 맞춤
+import { sendAgentChat } from '../api/agentApi'; 
+
 import styles from './LoggedInHome.module.css';
 
 export default function LoggedInHome() {
   const INITIAL_MESSAGE = { 
     id: 1, 
     sender: 'ai', 
-    text: '안녕하세요! FinMate AI입니다. 📈\n무엇을 도와드릴까요?' 
+    text: '안녕하세요! FinMate AI입니다. 📈\n궁금한 종목을 물어보시면 분석해 드립니다.' 
   };
 
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(false);
   
-  // ★ 로딩 상태 추가 (AI가 생각 중인지)
+  // AI가 분석 중인지 여부
   const [isLoading, setIsLoading] = useState(false);
 
   // ★ API 연동된 메시지 전송 핸들러
@@ -27,34 +29,38 @@ export default function LoggedInHome() {
     const userMessage = { id: Date.now(), sender: 'user', text: text };
     setMessages((prev) => [...prev, userMessage]);
     
-    // 2. 로딩 시작
+    // 2. 로딩 시작 (입력창 비활성화됨)
     setIsLoading(true);
 
     try {
-      // 3. API 호출 (여기서 1.5초 딜레이가 걸림)
-      const response = await sendChatMessage(text);
+      // 3. ★ [수정 2] 실제 에이전트 API 호출 (분석 시간이 꽤 걸립니다)
+      const response = await sendAgentChat(text);
 
-      // 4. API 응답을 UI 형식으로 변환하여 추가
-      // (API는 role/content를 주고, UI는 sender/text를 씀)
+      // 4. ★ [수정 3] API 응답 구조 매핑
+      // 명세서: { answer: "...", loop_count: 3, ... }
       const aiMessage = { 
-        id: response.id, 
-        sender: 'ai', // 무조건 AI 응답이므로 'ai' 고정
-        text: response.content 
+        id: Date.now() + 1, // 유저 메시지와 ID 겹침 방지
+        sender: 'ai', 
+        // 백엔드 명세서상 content가 아니라 answer 입니다.
+        text: response.answer, 
+        // (선택사항) 추론 횟수가 있다면 나중에 표시에 활용 가능
+        loopCount: response.loop_count 
       };
       
       setMessages((prev) => [...prev, aiMessage]);
 
     } catch (error) {
       console.error("메시지 전송 에러:", error);
+      
       // 에러 메시지 표시
       const errorMsg = { 
-        id: Date.now(), 
+        id: Date.now() + 2, 
         sender: 'ai', 
-        text: "죄송합니다. 오류가 발생하여 답변을 가져오지 못했습니다." 
+        text: `죄송합니다. 답변을 가져오는 데 실패했습니다.\n오류 내용: ${error.message}` 
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
-      // 5. 로딩 끝
+      // 5. 로딩 끝 (입력창 다시 활성화)
       setIsLoading(false);
     }
   };
@@ -66,7 +72,7 @@ export default function LoggedInHome() {
   };
 
   const handleSelectLog = (log) => {
-    // (이 부분은 나중에 API가 나오면 수정)
+    // (추후 로그 API 연동 시 수정될 부분)
     const oldMessages = [
       { id: 10, sender: 'user', text: log.title }, 
       { id: 11, sender: 'ai', text: `"${log.title}"에 대한 과거 상담 내역입니다.\n(이 내용은 읽기 전용입니다)` }
@@ -107,10 +113,10 @@ export default function LoggedInHome() {
         <div className={styles.chatContent}>
            <ChatWindow messages={messages} />
            
-           {/* ★ 로딩 인디케이터 추가 */}
+           {/* 로딩 멘트 구체화 */}
            {isLoading && (
              <div className={styles.typingIndicator}>
-               <span>AI가 답변을 생성하고 있습니다... 💬</span>
+               <span>🤖 AI가 시장 데이터를 정밀 분석 중입니다... (최대 1~3분 소요)</span>
              </div>
            )}
         </div>
@@ -119,7 +125,7 @@ export default function LoggedInHome() {
       <footer className={styles.inputSection}>
         <div className={styles.inputWrapper}>
           {!isReadOnly ? (
-            // 로딩 중일 때는 전송 버튼 막으려면 disabled={isLoading} 전달 가능
+            // 로딩 중일 때는 전송 버튼 막으려면 disabled={isLoading} 전달
             <QuestionInput onSendMessage={handleSendMessage} disabled={isLoading} />
           ) : (
             <div className={styles.readOnlyMessage}>
